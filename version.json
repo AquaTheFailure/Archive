@@ -1,4 +1,5 @@
-{
-  "version": "1.0.0",
-  "downloadURL": "https://github.com/AquaTheFailure/Archive"
+{  
+  "latestVersion": "1.0.0",  
+  "downloadURL": "https://github.com/AquaTheFailure/Archive",  
+  "siteHTML": "<div><h1>My Real Site</h1><p>Welcome!</p><!-- more html here --></div>"  
 }
