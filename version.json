@@ -1,5 +1,5 @@
-{  
-  "latestVersion": "1.0.0",  
-  "downloadURL": "https://github.com/AquaTheFailure/Archive",  
-  "siteHTML": "<div><h1>My Real Site</h1><p>Welcome!</p><!-- more html here --></div>"  
+{
+  "latestVersion": "1.0.0",
+  "downloadURL": "https://github.com/AquaTheFailure/Archive",
+  "siteHTML": "<h1>Welcome to the Real Site!</h1><p>This is loaded from JSON!</p>"
 }
