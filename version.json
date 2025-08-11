@@ -1,1 +1,4 @@
-{ "latestVersion": "1.0.0", "downloadURL": "https://github.com/AquaTheFailure/Archive" }
+{
+  "version": "1.0.0",
+  "downloadURL": "https://github.com/AquaTheFailure/Archive"
+}
