@@ -29,51 +29,58 @@
 
 <script>
   const CURRENT_VERSION = "2.0.0";
-  const VERSION_JSON_URL = "https://raw.githubusercontent.com/AquaTheFailure/Archive/main/version.json";
+const VERSION_JSON_URL = "https://raw.githubusercontent.com/AquaTheFailure/Archive/main/version.json";
 
-  function compareVersions(a, b) {
-    const pa = a.split('.').map(Number);
-    const pb = b.split('.').map(Number);
-    for (let i = 0; i < Math.max(pa.length, pb.length); i++) {
-      const na = pa[i] || 0;
-      const nb = pb[i] || 0;
-      if (na > nb) return 1;
-      if (na < nb) return -1;
-    }
-    return 0;
+function compareVersions(a, b) {
+  const pa = a.trim().split('.').map(Number);
+  const pb = b.trim().split('.').map(Number);
+  for (let i = 0; i < Math.max(pa.length, pb.length); i++) {
+    const na = pa[i] || 0;
+    const nb = pb[i] || 0;
+    if (na > nb) return 1;
+    if (na < nb) return -1;
   }
+  return 0;
+}
 
-  async function checkVersionAndLoadSite() {
-    const container = document.getElementById("container");
-    const statusEl = document.getElementById("status");
+async function checkVersionAndLoadSite() {
+  const container = document.getElementById("container");
+  const statusEl = document.getElementById("status");
 
-    try {
-      const resp = await fetch(VERSION_JSON_URL, { cache: "no-store" });
-      if (!resp.ok) throw new Error("Failed to fetch version info");
-      const data = await resp.json();
+  try {
+    const resp = await fetch(VERSION_JSON_URL, { cache: "no-store" });
+    if (!resp.ok) throw new Error("Failed to fetch version info");
+    const data = await resp.json();
 
-      const latestVersion = data.latestVersion || data.version;
-      if (!latestVersion) throw new Error("Version info missing in JSON");
+    const latestVersionRaw = data.latestVersion || data.version;
+    if (!latestVersionRaw) throw new Error("Version info missing in JSON");
 
-      const cmp = compareVersions(CURRENT_VERSION, latestVersion);
+    const latestVersion = latestVersionRaw.trim();
 
-      if (cmp >= 0) {
-        if (!data.siteHTML) throw new Error("Site HTML missing in JSON");
-        container.innerHTML = data.siteHTML;
-        document.title = "Real Site Loaded";
-      } else {
-        statusEl.innerHTML = `Outdated version! Latest: <strong>v${latestVersion}</strong>.<br>Redirecting to download page...`;
-        setTimeout(() => {
-          window.location.href = data.downloadURL;
-        }, 5000);
-      }
-    } catch (err) {
-      statusEl.textContent = "Error checking version. Please check your internet connection.";
-      console.error(err);
+    console.log('CURRENT_VERSION:', CURRENT_VERSION);
+    console.log('latestVersion from JSON:', latestVersion);
+
+    const cmp = compareVersions(CURRENT_VERSION, latestVersion);
+
+    console.log('compareVersions result:', cmp);
+
+    if (cmp >= 0) {
+      if (!data.siteHTML) throw new Error("Site HTML missing in JSON");
+      container.innerHTML = data.siteHTML;
+      document.title = "Real Site Loaded";
+    } else {
+      statusEl.innerHTML = `Outdated version! Latest: <strong>v${latestVersion}</strong>.<br>Redirecting to download page...`;
+      setTimeout(() => {
+        window.location.href = data.downloadURL;
+      }, 5000);
     }
+  } catch (err) {
+    statusEl.textContent = "Error checking version. Please check your internet connection.";
+    console.error(err);
   }
+}
 
-  checkVersionAndLoadSite();
+checkVersionAndLoadSite();
 </script>
 
 </body>
