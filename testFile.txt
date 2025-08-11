@@ -1,0 +1,6 @@
+Test 1:
+  Equal: ?
+  Different: True
+
+True = Works
+False = Fails
