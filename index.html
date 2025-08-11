@@ -1,38 +1,66 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Version Info</title>
-  <style>
-    body {
-      font-family: Arial, sans-serif;
-      background-color: #121212;
-      color: #ffffff;
-      text-align: center;
-      padding-top: 50px;
-    }
-    .version {
-      font-size: 1.5rem;
-      margin-top: 20px;
-      color: #00ff9d;
-    }
-  </style>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Version Check and Load Site</title>
+<style>
+  body, html {
+    height: 100%; margin: 0; font-family: Arial, sans-serif; background: #121212; color: #eee;
+    display: flex; justify-content: center; align-items: center;
+  }
+  #container {
+    width: 90vw; max-width: 900px; background: #1e1e1e; padding: 20px; border-radius: 12px; box-shadow: 0 0 20px #00ff9d;
+    text-align: center;
+  }
+  #status {
+    font-size: 1.2rem; margin-bottom: 20px;
+  }
+  a.button {
+    background: #00ff9d; color: #121212; padding: 10px 20px; border-radius: 8px;
+    text-decoration: none; font-weight: bold; display: inline-block; margin-top: 15px;
+  }
+</style>
 </head>
 <body>
-  <h1>Current Version</h1>
-  <div class="version" id="version">Loading...</div>
+  <div id="container">
+    <div id="status">Checking version...</div>
+  </div>
 
-  <script>
-    fetch('version.json')
-      .then(response => response.json())
-      .then(data => {
-        document.getElementById('version').textContent = `v${data.version}`;
-      })
-      .catch(error => {
-        console.error('Error loading version:', error);
-        document.getElementById('version').textContent = 'Error loading version';
-      });
-  </script>
+<script>
+  const CURRENT_VERSION = "1.0.0";
+  const VERSION_JSON_URL = "https://raw.githubusercontent.com/AquaTheFailure/Archive/main/version.json";
+
+  async function checkVersionAndLoadSite() {
+    const container = document.getElementById("container");
+    const statusEl = document.getElementById("status");
+
+    try {
+      const resp = await fetch(VERSION_JSON_URL, { cache: "no-store" });
+      if (!resp.ok) throw new Error("Failed to fetch version info");
+      const data = await resp.json();
+
+      const latestVersion = data.latestVersion || data.version;
+      if (!latestVersion) throw new Error("Version info missing in JSON");
+
+      if (latestVersion === CURRENT_VERSION) {
+        if (!data.siteHTML) throw new Error("Site HTML missing in JSON");
+        container.innerHTML = data.siteHTML;
+        document.title = "Real Site Loaded";
+      } else {
+        statusEl.innerHTML = `Outdated version! Latest: <strong>v${latestVersion}</strong>.<br>Redirecting to download page...`;
+        setTimeout(() => {
+          window.location.href = data.downloadURL;
+        }, 5000);
+      }
+    } catch (err) {
+      statusEl.textContent = "Error checking version. Please check your internet connection.";
+      console.error(err);
+    }
+  }
+
+  checkVersionAndLoadSite();
+</script>
+
 </body>
 </html>
