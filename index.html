@@ -31,6 +31,19 @@
   const CURRENT_VERSION = "1.0.0";
   const VERSION_JSON_URL = "https://raw.githubusercontent.com/AquaTheFailure/Archive/main/version.json";
 
+  // Compare semantic versions: returns -1 if a < b, 1 if a > b, 0 if equal
+  function compareVersions(a, b) {
+    const pa = a.split('.').map(Number);
+    const pb = b.split('.').map(Number);
+    for (let i = 0; i < Math.max(pa.length, pb.length); i++) {
+      const na = pa[i] || 0;
+      const nb = pb[i] || 0;
+      if (na > nb) return 1;
+      if (na < nb) return -1;
+    }
+    return 0;
+  }
+
   async function checkVersionAndLoadSite() {
     const container = document.getElementById("container");
     const statusEl = document.getElementById("status");
@@ -43,11 +56,15 @@
       const latestVersion = data.latestVersion || data.version;
       if (!latestVersion) throw new Error("Version info missing in JSON");
 
-      if (latestVersion === CURRENT_VERSION) {
+      const cmp = compareVersions(CURRENT_VERSION, latestVersion);
+
+      if (cmp >= 0) {
+        // CURRENT_VERSION is equal or newer than latestVersion from JSON: allow access
         if (!data.siteHTML) throw new Error("Site HTML missing in JSON");
         container.innerHTML = data.siteHTML;
         document.title = "Real Site Loaded";
       } else {
+        // JSON version is newer: block and redirect
         statusEl.innerHTML = `Outdated version! Latest: <strong>v${latestVersion}</strong>.<br>Redirecting to download page...`;
         setTimeout(() => {
           window.location.href = data.downloadURL;
