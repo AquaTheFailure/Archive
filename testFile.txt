@@ -1,5 +1,5 @@
 Test 1:
-  Equal: ?
+  Equal: True
   Different: True
 
 True = Works
