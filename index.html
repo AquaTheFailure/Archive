@@ -28,68 +28,29 @@
   </div>
 
 <script>
-  const CURRENT_VERSION = "2.0.0";
+  const CURRENT_VERSION = "2.0.0"; // Your current version here
   const VERSION_JSON_URL = "https://raw.githubusercontent.com/AquaTheFailure/Archive/main/version.json";
-
-  // Your 404 page HTML
-  const ERROR_404_HTML = `
-    <!DOCTYPE html>
-    <html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>404 Error</title>
-    <style>
-      html, body {height: 100%;margin: 0;padding: 0;background-color: #000;color: #fff;font-family: Arial, sans-serif;display: flex;flex-direction: column;align-items: center;justify-content: center;}
-      .gif-container {margin-bottom: 20px;position: relative;top: 10px;}
-      .gif-container img {max-width: 300px;height: auto;border-radius: 10px;}
-      h1 {font-size: 3rem;font-weight: bold;margin: 0;}
-      p {font-size: 1.2rem;opacity: 0.8;}
-    </style></head>
-    <body>
-      <div class="gif-container">
-        <img src="https://gifdb.com/images/high/terrified-anime-loop-zch5o8atiybizqri.gif" alt="Terrified Anime GIF">
-      </div>
-      <h1>404 Error</h1>
-      <p>Page not found</p>
-    </body></html>
-  `;
-
   async function checkVersionAndLoadSite() {
     const container = document.getElementById("container");
     const statusEl = document.getElementById("status");
-
-    // If offline immediately show 404 page
-    if (!navigator.onLine) {
-      container.innerHTML = ERROR_404_HTML;
-      return;
-    }
-
     try {
       const response = await fetch(VERSION_JSON_URL, { cache: "no-store" });
       if (!response.ok) throw new Error("Failed to fetch version info");
 
       const data = await response.json();
+
       const latestVersion = (data.latestVersion || data.version || "").trim();
 
       if (latestVersion === CURRENT_VERSION) {
         if (!data.siteHTML) throw new Error("Site HTML missing in JSON");
-
-        // Load siteHTML
         container.innerHTML = data.siteHTML;
         document.title = "Real Site Loaded";
-
-        // Check for iframe in siteHTML
-        const iframe = container.querySelector("iframe");
-        if (iframe) {
-          iframe.onerror = () => {
-            container.innerHTML = ERROR_404_HTML;
-          };
-        }
-
       } else {
-        // Redirect if version mismatch
+        // Redirect immediately if version is different
         window.location.href = data.downloadURL || "https://github.com/AquaTheFailure/Archive";
       }
     } catch (err) {
-      container.innerHTML = ERROR_404_HTML;
+      statusEl.textContent = "Error checking version. Please check your internet connection.";
       console.error(err);
     }
   }
