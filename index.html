@@ -30,6 +30,7 @@
 <script>
   const CURRENT_VERSION = "2.0.0"; // Your current version here
   const VERSION_JSON_URL = "https://raw.githubusercontent.com/AquaTheFailure/Archive/main/version.json";
+
   async function checkVersionAndLoadSite() {
     const container = document.getElementById("container");
     const statusEl = document.getElementById("status");
@@ -38,7 +39,6 @@
       if (!response.ok) throw new Error("Failed to fetch version info");
 
       const data = await response.json();
-
       const latestVersion = (data.latestVersion || data.version || "").trim();
 
       if (latestVersion === CURRENT_VERSION) {
@@ -50,7 +50,18 @@
         window.location.href = data.downloadURL || "https://github.com/AquaTheFailure/Archive";
       }
     } catch (err) {
-      statusEl.textContent = "Error checking version. Please check your internet connection.";
+      // Show error404 HTML instead of text
+      try {
+        const errorResponse = await fetch(VERSION_JSON_URL, { cache: "no-store" });
+        const errorData = await errorResponse.json();
+        if (errorData.error404) {
+          container.innerHTML = errorData.error404;
+        } else {
+          statusEl.textContent = "An unknown error occurred.";
+        }
+      } catch (nestedErr) {
+        statusEl.textContent = "Failed to load error page.";
+      }
       console.error(err);
     }
   }
