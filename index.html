@@ -1,4 +1,3 @@
-<!--
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -82,85 +81,6 @@
 
 </body>
 </html>
--->
-<!DOCTYPE html>
-<html lang="en">
-<head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>Version Check and Load Site</title>
-<style>
-  body, html {
-    height: 100%; margin: 0; font-family: Arial, sans-serif; background: #121212; color: #eee;
-    display: flex; justify-content: center; align-items: center;
-  }
-  #container {
-    width: 90vw; max-width: 900px; background: #1e1e1e; padding: 20px; border-radius: 12px; box-shadow: 0 0 20px #00ff9d;
-    text-align: center;
-  }
-  #status {
-    font-size: 1.2rem; margin-bottom: 20px;
-  }
-  a.button {
-    background: #00ff9d; color: #121212; padding: 10px 20px; border-radius: 8px;
-    text-decoration: none; font-weight: bold; display: inline-block; margin-top: 15px;
-  }
-</style>
-</head>
-<body>
-  <div id="container">
-    <div id="status">Checking version...</div>
-  </div>
-
-<script>
-  const CURRENT_VERSION = "2.0.0"; // Your current version here
-  const VERSION_JSON_URL = "https://raw.githubusercontent.com/AquaTheFailure/Archive/main/version.json";
-
-  async function checkVersionAndLoadSite() {
-    const container = document.getElementById("container");
-    const statusEl = document.getElementById("status");
-    try {
-      const response = await fetch(VERSION_JSON_URL, { cache: "no-store" });
-      if (!response.ok) throw new Error("Failed to fetch version info");
-
-      const data = await response.json();
-      const latestVersion = (data.latestVersion || data.version || "").trim();
-
-      if (latestVersion === CURRENT_VERSION) {
-        if (!data.siteHTML) throw new Error("Site HTML missing in JSON");
-        // Replace entire body content for fullscreen effect
-        document.body.innerHTML = data.siteHTML;
-        // Make sure body uses full height and no margin/padding
-        document.body.style.margin = "0";
-        document.body.style.padding = "0";
-        document.documentElement.style.height = "100%";
-        document.body.style.height = "100%";
-        document.title = "Real Site Loaded";
-      } else {
-        // Redirect immediately if version is different
-        window.location.href = data.downloadURL || "https://github.com/AquaTheFailure/Archive";
-      }
-    } catch (err) {
-      // Show error404 HTML instead of text
-      try {
-        const errorResponse = await fetch(VERSION_JSON_URL, { cache: "no-store" });
-        const errorData = await errorResponse.json();
-        if (errorData.error404) {
-          document.body.innerHTML = errorData.error404;
-          document.body.style.margin = "0";
-          document.body.style.padding = "0";
-          document.documentElement.style.height = "100%";
-          document.body.style.height = "100%";
-        } else {
-          statusEl.textContent = "An unknown error occurred.";
-        }
-      } catch (nestedErr) {
-        statusEl.textContent = "Failed to load error page.";
-      }
-      console.error(err);
-    }
-  }
-
   checkVersionAndLoadSite();
 </script>
 
